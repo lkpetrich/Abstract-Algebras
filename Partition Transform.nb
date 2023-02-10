@@ -1,0 +1,834 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     32024,        826]
+NotebookOptionsPosition[     27558,        761]
+NotebookOutlinePosition[     28053,        779]
+CellTagsIndexPosition[     28010,        776]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ StyleBox["Partition Transform",
+  FontWeight->"Bold"],
+ "\n\nMany abstract-algebra entities can be decomposed as direct products of \
+other entities:\n(a,b) in A*B\nfor a in A and b in B\n\nWhich ones cannot be? \
+If one knows the total number for different sizes, then one can find the \
+number of indecomposable ones for those sizes.\nN(2) = NID(2) + NID(2)^(2)\n\
+N(3) = NID(3) + NID(2)*NID(1) + NID(1)^(3)\nwhere the ^(2) and ^(3) refer to \
+a symmetrized product: N^(m) = N*(N+1)*...*(N+m-1)/m!\n\nEuler Transform -- \
+from Wolfram MathWorld\nhttps://mathworld.wolfram.com/EulerTransform.html\n\
+The third Euler transform in that article is this document\[CloseCurlyQuote]s \
+partition transform\n\nM\[ODoubleDot]bius inversion formula - Wikipedia\n\
+https://en.wikipedia.org/wiki/M%C3%B6bius_inversion_formula\n\
+M\[ODoubleDot]bius Inversion Formula -- from Wolfram MathWorld\n\
+https://mathworld.wolfram.com/MoebiusInversionFormula.html\n\nPartition \
+transform generating function: a -> b\n1 + sum_i b(i)*x^i = product_i \
+1/(1-x^i)^a(i)\n\nDivisor-sum generating function: a->b\nsum_i b(i)*x^i = \
+sum_i a(i)*x^i/(1-x^i)\nsum_i b_i/i^s = zeta(s) * sum_i a_i/i^s\n\n",
+ StyleBox["Functions",
+  FontWeight->"Bold"],
+ "\n\nFactorIntegerFix[n] - returns empty list for n <= 1\n\
+PrimePowerFunc[n,f] - decomposes n into prime powers, calculates product of \
+f[prime,power]\n\nDivisorSumArray[narr] - list of sums over divisors for each \
+index\nInverseDvsrSumArray[narr] - undoes DivisorSumArray[narr] - uses a \
+Moebius transform\n\nPartCompArray[narr] - returns an array of numbers \
+composed by partition\nPartIrredArray[narr] - undoes PartCompArray[narr]\n\n\
+Original implementations:\nPartCompArrayOrig[narr] - returns an array of \
+numbers composed by partition\nPartIrredArrayOrig[narr] - undoes \
+PartCompArrayOrig[narr]\n\nDivisorsOfList[nlst] - collection of divisors of \
+every member of nlst\nFactorSets[nlst] - collection of factorizations of \
+every member of nlst and its divisors, as value -> (list of factorizations)\n\
+FactorSetsContig[nmax] - does for 1 to nmax, and returns a list of lists of \
+factorizations\nDivisorCompFunLst[nf,nlst] - for what FactorSets[] returns, \
+returns value -> sum over product of nf[factor] for every factor in each \
+factorization\nDivisorCompArray[nvals] - like the previous, but it works from \
+an array of values\nDivisorIrredFunLst[nf,nlst] - undoes \
+DivisorCompFunLst[nf,nlst]\nDivisorCompArray[nvals] - undoes \
+DivisorCompArray[nvals]\[LineSeparator]\nAll arrays start at index 1"
+}], "Text",ExpressionUUID->"c86a98a7-11da-477a-af2c-2c7b115e9ca3"],
+
+Cell[CellGroupData[{
+
+Cell["Prime-Power Decomposition", "Section",ExpressionUUID->"f0f84b08-632d-4053-aaff-43cecf71e276"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FactorIntegerFix", "[", "n_Integer", "]"}], " ", ":=", " ", 
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{"n", ">", "1"}], ",", 
+    RowBox[{"FactorInteger", "[", "n", "]"}], ",", 
+    RowBox[{"{", "}"}]}], "]"}]}]], "Input",
+ CellLabel->
+  "In[2428]:=",ExpressionUUID->"6a0c5ebb-c4c3-4d7d-a7c8-2d163d6c53c0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FactorIntegerFix", "::", "usage"}], " ", "=", " ", 
+   "\"\<Fixes the FactorInteger[] function so that it returns an empty list \
+of factors for an arg <= 1\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2429]:=",ExpressionUUID->"18e8eeba-e0bb-47a3-83da-8c30f4615d9e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PrimePowerFunc", "[", 
+   RowBox[{"n_Integer", ",", "f_"}], "]"}], " ", ":=", " ", 
+  RowBox[{"Product", "[", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"f", " ", "@@", " ", "pp"}], ")"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"pp", ",", 
+      RowBox[{"FactorIntegerFix", "[", "n", "]"}]}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellLabel->
+  "In[2430]:=",ExpressionUUID->"3eb867c4-9ebf-4b36-a7be-b40132c60ef0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"PrimePowerFunc", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: number, function of prime power with args (prime), (power). \
+Returns a product of those functions of prime powers\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2431]:=",ExpressionUUID->"e714d15c-e6db-4f71-aa21-5c95fc508a3a"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Composition from partitions - indecomposable values ", "Section",ExpressionUUID->"7b8ac8d8-39b4-4a83-828b-98086652d6b8"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SymmPower", "[", 
+   RowBox[{"n_", ",", "cnt_Integer"}], "]"}], " ", ":=", " ", 
+  RowBox[{"Product", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"n", "+", "i", "-", "1"}], ")"}], "/", "i"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"i", ",", "cnt"}], "}"}]}], "]"}]}]], "Input",
+ CellLabel->
+  "In[2432]:=",ExpressionUUID->"0af05713-264f-4d92-8218-8fb61487049f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"SymmPower", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: number, count. Returns the total number of an unordered, \
+possibly-repeated (symmetric) selection of (count) entities from a set of \
+(number) of them.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2433]:=",ExpressionUUID->"373e42d2-d8e0-4cd8-bd3c-496f09819b64"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartCompArrayOrig", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"nlen", ",", "n", ",", "pts", ",", "pt", ",", "pti"}], "}"}], 
+    ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"nlen", " ", "=", " ", 
+      RowBox[{"Length", "[", "narr", "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pts", " ", "=", " ", 
+         RowBox[{"Tally", " ", "/@", " ", 
+          RowBox[{"IntegerPartitions", "[", "n", "]"}]}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Expand", "[", 
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"Product", "[", 
+            RowBox[{
+             RowBox[{"SymmPower", "[", 
+              RowBox[{
+               RowBox[{"narr", "[", 
+                RowBox[{"[", 
+                 RowBox[{"pti", "[", 
+                  RowBox[{"[", "1", "]"}], "]"}], "]"}], "]"}], ",", 
+               RowBox[{"pti", "[", 
+                RowBox[{"[", "2", "]"}], "]"}]}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"{", 
+              RowBox[{"pti", ",", "pt"}], "}"}]}], "]"}], ",", 
+           "\[IndentingNewLine]", 
+           RowBox[{"{", 
+            RowBox[{"pt", ",", "pts"}], "}"}]}], "]"}], "]"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "nlen"}], "}"}]}], "]"}]}]}], "\[IndentingNewLine]",
+    "]"}]}]], "Input",
+ CellLabel->
+  "In[2434]:=",ExpressionUUID->"ba3df0d8-cc2b-4d9e-be79-f84f557a764a"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"PartCompArrayOrig", "::", "usage"}], " ", "=", " ", 
+   "\"\<Original function. Args: list of irreducible counts (counts for 1, 2, \
+...). Returns list of composed counts.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2435]:=",ExpressionUUID->"8bcdbdc7-5c7b-420d-9339-45e46f0e73e4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartIrredArrayOrig", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "irrval", ",", "nlen", ",", "n", ",", "pts", ",", "pt", ",", "pti"}], 
+     "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"nlen", " ", "=", " ", 
+      RowBox[{"Length", "[", "narr", "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pts", " ", "=", " ", 
+         RowBox[{"Tally", " ", "/@", " ", 
+          RowBox[{"IntegerPartitions", "[", 
+           RowBox[{"n", ",", 
+            RowBox[{"{", 
+             RowBox[{"2", ",", "n"}], "}"}]}], "]"}]}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"irrval", "[", "n", "]"}], " ", "=", " ", 
+         RowBox[{"Expand", "[", 
+          RowBox[{
+           RowBox[{"narr", "[", 
+            RowBox[{"[", "n", "]"}], "]"}], " ", "-", " ", 
+           RowBox[{"Sum", "[", 
+            RowBox[{
+             RowBox[{"Product", "[", 
+              RowBox[{
+               RowBox[{"SymmPower", "[", 
+                RowBox[{
+                 RowBox[{"irrval", "[", 
+                  RowBox[{"pti", "[", 
+                   RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", 
+                 RowBox[{"pti", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}]}], "]"}], ",", 
+               "\[IndentingNewLine]", 
+               RowBox[{"{", 
+                RowBox[{"pti", ",", "pt"}], "}"}]}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"{", 
+              RowBox[{"pt", ",", "pts"}], "}"}]}], "]"}]}], "]"}]}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "nlen"}], "}"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Array", "[", 
+      RowBox[{"irrval", ",", "nlen"}], "]"}]}]}], "\[IndentingNewLine]", 
+   "]"}]}]], "Input",
+ CellLabel->
+  "In[2436]:=",ExpressionUUID->"e4f5fd41-b12f-4d88-8874-b31abd4bf63f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"PartIrredArrayOrig", "::", "usage"}], " ", "=", " ", 
+   "\"\<Original function. Args: list of composed counts (counts for 1, 2, \
+...). Returns list of irreducible counts.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2437]:=",ExpressionUUID->"1aa43aba-209f-4b9f-bc9a-e79d13269f0e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorSumArray", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"Expand", "[", 
+      RowBox[{"DivisorSum", "[", 
+       RowBox[{"n", ",", 
+        RowBox[{
+         RowBox[{"narr", "[", 
+          RowBox[{"[", "#", "]"}], "]"}], "&"}]}], "]"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"n", ",", 
+       RowBox[{"Length", "[", "narr", "]"}]}], "}"}]}], "]"}], " ", "//", " ",
+    "Expand"}]}]], "Input",
+ CellLabel->
+  "In[2438]:=",ExpressionUUID->"65cdd591-348f-459a-a980-bdb36879db44"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorSumArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: list of numbers. Returns sums over that list indexed by the \
+divisors of each final-result index\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2439]:=",ExpressionUUID->"be2d9329-4ec0-4ee2-956c-3c1a60e1a3de"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"InverseDvsrSumArray", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"Expand", "[", 
+      RowBox[{"DivisorSum", "[", 
+       RowBox[{"n", ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"MoebiusMu", "[", "#", "]"}], "*", 
+          RowBox[{"narr", "[", 
+           RowBox[{"[", 
+            RowBox[{"n", "/", "#"}], "]"}], "]"}]}], "&"}]}], "]"}], "]"}], 
+     ",", 
+     RowBox[{"{", 
+      RowBox[{"n", ",", 
+       RowBox[{"Length", "[", "narr", "]"}]}], "}"}]}], "]"}], " ", "//", " ",
+    "Expand"}]}]], "Input",
+ CellLabel->
+  "In[2440]:=",ExpressionUUID->"00b912a9-499f-4294-b531-bfb7529833a7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"InverseDvsrSumArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: list of numbers. Returns inverse of divisor sums\>\""}], 
+  ";"}]], "Input",
+ CellLabel->
+  "In[2441]:=",ExpressionUUID->"24c893f7-240c-4d05-a32b-c8b05819e8fd"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartCompArray", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"nmax", ",", "itmdarr", ",", "rsarf"}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"nmax", " ", "=", " ", 
+      RowBox[{"Length", "[", "narr", "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"itmdarr", " ", "=", " ", 
+      RowBox[{"DivisorSumArray", "[", 
+       RowBox[{"narr", "*", 
+        RowBox[{"Range", "[", "nmax", "]"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"rsarf", "[", "n", "]"}], " ", "=", " ", 
+        RowBox[{"Expand", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"1", "/", "n"}], ")"}], "*", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"itmdarr", "[", 
+             RowBox[{"[", "n", "]"}], "]"}], " ", "+", " ", 
+            RowBox[{"Sum", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"itmdarr", "[", 
+                RowBox[{"[", "k", "]"}], "]"}], "*", 
+               RowBox[{"rsarf", "[", 
+                RowBox[{"n", "-", "k"}], "]"}]}], ",", 
+              RowBox[{"{", 
+               RowBox[{"k", ",", 
+                RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}]}], ")"}]}], "]"}]}],
+        ",", "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "nmax"}], "}"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Array", "[", 
+      RowBox[{"rsarf", ",", "nmax"}], "]"}]}]}], "\[IndentingNewLine]", 
+   "]"}]}]], "Input",
+ CellLabel->
+  "In[2442]:=",ExpressionUUID->"8e3f9b1a-c610-4dff-ad57-d75a359b8aaf"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"PartCompArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Faster version. Args: list of irreducible counts (counts for 1, 2, \
+...). Returns list of composed counts.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2443]:=",ExpressionUUID->"04ffed0b-039b-412f-beae-51461d1c6ab5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartIrredArray", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"nmax", ",", "itmdarf"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"nmax", " ", "=", " ", 
+      RowBox[{"Length", "[", "narr", "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"itmdarf", "[", "n", "]"}], " ", "=", " ", 
+        RowBox[{"Expand", "[", 
+         RowBox[{
+          RowBox[{"n", "*", 
+           RowBox[{"narr", "[", 
+            RowBox[{"[", "n", "]"}], "]"}]}], " ", "-", " ", 
+          RowBox[{"Sum", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"itmdarf", "[", "k", "]"}], "*", 
+             RowBox[{"narr", "[", 
+              RowBox[{"[", 
+               RowBox[{"n", "-", "k"}], "]"}], "]"}]}], ",", 
+            RowBox[{"{", 
+             RowBox[{"k", ",", 
+              RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}]}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "nmax"}], "}"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Expand", "[", 
+      RowBox[{
+       RowBox[{"InverseDvsrSumArray", "[", 
+        RowBox[{"Array", "[", 
+         RowBox[{"itmdarf", ",", "nmax"}], "]"}], "]"}], "/", 
+       RowBox[{"Range", "[", "nmax", "]"}]}], "]"}]}]}], 
+   "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellLabel->
+  "In[2444]:=",ExpressionUUID->"32a6fd4d-4542-4725-9e06-4520aa96bc84"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"PartIrredArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Faster version. Args: list of composed counts (counts for 1, 2, ...). \
+Returns list of irreducible counts.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2445]:=",ExpressionUUID->"0c491fce-4cfd-4774-9400-e57058f25b72"],
+
+Cell[CellGroupData[{
+
+Cell["Tests", "Subsection",ExpressionUUID->"d6495ee9-da85-4474-9b37-67f2b7b6307f"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+  "Arg", " ", "is", " ", "some", " ", "array", " ", "to", " ", "do", " ", 
+   "tests", " ", "on"}], " ", "*)"}]], "Input",
+ CellLabel->
+  "In[2446]:=",ExpressionUUID->"aa04472c-4ca6-4633-87ed-8ec3dc924edc"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartCompIrredTest", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"PartCompArray", "[", 
+    RowBox[{"PartIrredArray", "[", "narr", "]"}], "]"}], " ", "-", " ", 
+   "narr"}]}]], "Input",
+ CellLabel->
+  "In[2447]:=",ExpressionUUID->"ce7ab7c7-8cc5-4523-ad11-cfa4f6e13ef7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartIrredCompTest", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"PartIrredArray", "[", 
+    RowBox[{"PartCompArray", "[", "narr", "]"}], "]"}], " ", "-", " ", 
+   "narr"}]}]], "Input",
+ CellLabel->
+  "In[2448]:=",ExpressionUUID->"ae7f15dc-3634-42d4-b1dc-79ad69f6bc46"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartCompArrayTest", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"PartCompArrayOrig", "[", "narr", "]"}], " ", "-", " ", 
+   RowBox[{"PartCompArray", "[", "narr", "]"}]}]}]], "Input",
+ CellLabel->
+  "In[2449]:=",ExpressionUUID->"8b546967-6a91-4eb3-a327-1ffb0d0bb995"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PartIrredArrayTest", "[", "narr_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"PartIrredArrayOrig", "[", "narr", "]"}], " ", "-", " ", 
+   RowBox[{"PartIrredArray", "[", "narr", "]"}]}]}]], "Input",
+ CellLabel->
+  "In[2450]:=",ExpressionUUID->"cafee51b-0026-431f-af39-300111ba1293"]
+}, Closed]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Composition from divisors - indecomposable values ", "Section",ExpressionUUID->"6658b3cf-2234-44ce-8180-7d757b99da86"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorsOfList", "[", "nlst_", "]"}], " ", ":=", " ", 
+  RowBox[{"Union", " ", "@@", " ", 
+   RowBox[{"(", 
+    RowBox[{"Divisors", " ", "/@", " ", 
+     RowBox[{"Union", "[", "nlst", "]"}]}], ")"}]}]}]], "Input",
+ CellLabel->
+  "In[2451]:=",ExpressionUUID->"b9842963-8916-48e7-885d-d8f4e14155b3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorsOfList", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: list of numbers. Returns divisors shared by at least one of \
+these numbers.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2452]:=",ExpressionUUID->"1711ad4d-42dc-4bb6-ac74-faefc3dae409"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FactorSets", "[", "nlst_", "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"ndvs", ",", "dvslst"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"ndvs", " ", "=", " ", 
+      RowBox[{"DivisorsOfList", "[", "nlst", "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"dvslst", "[", "n", "]"}], " ", "=", " ", 
+        RowBox[{"Union", " ", "@@", " ", 
+         RowBox[{"Table", "[", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"Which", "[", 
+            RowBox[{
+             RowBox[{"dv", "\[Equal]", "n"}], ",", 
+             RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+             RowBox[{"dv", " ", "\[Equal]", " ", "1"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"{", "n", "}"}], "}"}], ",", "\[IndentingNewLine]", 
+             "True", ",", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Sort", "[", 
+                RowBox[{"Append", "[", 
+                 RowBox[{"#", ",", "dv"}], "]"}], "]"}], "&"}], " ", "/@", 
+              " ", 
+              RowBox[{"dvslst", "[", 
+               RowBox[{"n", "/", "dv"}], "]"}]}]}], "\[IndentingNewLine]", 
+            "]"}], ",", "\[IndentingNewLine]", 
+           RowBox[{"{", 
+            RowBox[{"dv", ",", 
+             RowBox[{"Divisors", "[", "n", "]"}]}], "}"}]}], "]"}]}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "ndvs"}], "}"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"n", "\[Rule]", 
+        RowBox[{"dvslst", "[", "n", "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "ndvs"}], "}"}]}], "]"}]}]}], "\[IndentingNewLine]",
+    "]"}]}]], "Input",
+ CellLabel->
+  "In[2453]:=",ExpressionUUID->"3f234219-39c6-4e03-be71-f2a629756391"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FactorSets", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: list of numbers. Returns for these numbers and their divisors a \
+list of all sets of factors of each number, as (number) -> (factor \
+sets)\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2454]:=",ExpressionUUID->"ba8f9e22-9bf9-4def-8089-a782f6119e2c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FactorSetsContig", "[", "nmax_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"#", " ", "/.", " ", 
+      RowBox[{"FactorSets", "[", "#", "]"}]}], ")"}], "&"}], " ", "@", " ", 
+   RowBox[{"Range", "[", "nmax", "]"}]}]}]], "Input",
+ CellLabel->
+  "In[2455]:=",ExpressionUUID->"ed4d64fa-60a4-4067-ade7-44b7252322e6"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FactorSetsContig", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: max of list of numbers. Returns a list of factor sets\>\""}], 
+  ";"}]], "Input",
+ CellLabel->
+  "In[2456]:=",ExpressionUUID->"eb90426c-7db5-4540-9af8-c81ca1521dba"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorCompFunLst", "[", 
+   RowBox[{"nf_", ",", "nlst_"}], "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"fss", ",", "ntot", ",", "parts", ",", "nrls", ",", "n"}], "}"}],
+     ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"fss", " ", "=", " ", 
+      RowBox[{"FactorSets", "[", "nlst", "]"}]}], ";", "\[IndentingNewLine]", 
+     
+     RowBox[{"ntot", " ", "=", " ", 
+      RowBox[{"First", " ", "/@", " ", "fss"}]}], ";", "\[IndentingNewLine]", 
+     
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"parts", " ", "=", " ", 
+         RowBox[{"Tally", " ", "/@", " ", 
+          RowBox[{"(", 
+           RowBox[{"n", " ", "/.", " ", "fss"}], ")"}]}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"nrls", " ", "=", " ", 
+         RowBox[{
+          RowBox[{"Sum", "[", 
+           RowBox[{
+            RowBox[{"Product", "[", 
+             RowBox[{
+              RowBox[{"SymmPower", "[", 
+               RowBox[{
+                RowBox[{"nf", "[", 
+                 RowBox[{"pt", "[", 
+                  RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", 
+                RowBox[{"pt", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}]}], "]"}], ",", 
+              RowBox[{"{", 
+               RowBox[{"pt", ",", "prt"}], "}"}]}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"prt", ",", "parts"}], "}"}]}], "]"}], "//", " ", 
+          "Expand"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"n", "\[Rule]", "nrls"}]}], ",", "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "ntot"}], "}"}]}], "]"}]}]}], "\[IndentingNewLine]",
+    "]"}]}]], "Input",
+ CellLabel->
+  "In[2457]:=",ExpressionUUID->"3d813b61-e85e-44a9-b2cd-b4773741824c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorCompFunLst", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: irreducible-value function, list of numbers. Returns composed \
+values as (number) -> (composed value) for all divisors of the list of \
+numbers\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2458]:=",ExpressionUUID->"9a8b8a94-55bc-4c41-b826-996d90cf49ef"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorCompArray", "[", "nvals_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"#", " ", "/.", " ", 
+      RowBox[{"DivisorCompFunLst", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Part", "[", 
+          RowBox[{"nvals", ",", "#"}], "]"}], "&"}], ",", "#"}], "]"}]}], 
+     ")"}], "&"}], " ", "@", " ", 
+   RowBox[{"Range", "[", 
+    RowBox[{"Length", "[", "nvals", "]"}], "]"}]}]}]], "Input",
+ CellLabel->
+  "In[2459]:=",ExpressionUUID->"48bd32a1-cb4c-4eaf-911c-e72e596eaf7a"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorCompArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: irreducible values. Returns: composed values summing over all \
+divisor sets.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2460]:=",ExpressionUUID->"a1ef5c88-c1cb-45dd-8909-2b79f7d72bf3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorIrredFunLst", "[", 
+   RowBox[{"nf_", ",", "nlst_"}], "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"fss", ",", "ntot", ",", "parts", ",", "nrls", ",", "n"}], "}"}],
+     ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"fss", " ", "=", " ", 
+      RowBox[{"FactorSets", "[", "nlst", "]"}]}], ";", "\[IndentingNewLine]", 
+     
+     RowBox[{"ntot", " ", "=", " ", 
+      RowBox[{"First", " ", "/@", " ", "fss"}]}], ";", "\[IndentingNewLine]", 
+     
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"parts", " ", "=", " ", 
+         RowBox[{"Tally", " ", "/@", " ", 
+          RowBox[{"Select", "[", 
+           RowBox[{
+            RowBox[{"n", " ", "/.", " ", "fss"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Length", "[", "#", "]"}], ">", "1"}], "&"}]}], 
+           "]"}]}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"nrls", "[", "n", "]"}], " ", "=", " ", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"nf", "[", "n", "]"}], " ", "-", " ", 
+           RowBox[{"Sum", "[", 
+            RowBox[{
+             RowBox[{"Product", "[", 
+              RowBox[{
+               RowBox[{"SymmPower", "[", 
+                RowBox[{
+                 RowBox[{"nrls", "[", 
+                  RowBox[{"pt", "[", 
+                   RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", 
+                 RowBox[{"pt", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}]}], "]"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"pt", ",", "prt"}], "}"}]}], "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"prt", ",", "parts"}], "}"}]}], "]"}]}], "//", " ", 
+          "Expand"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"n", "\[Rule]", 
+         RowBox[{"nrls", "[", "n", "]"}]}]}], ",", "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "ntot"}], "}"}]}], "]"}]}]}], "\[IndentingNewLine]",
+    "]"}]}]], "Input",
+ CellLabel->
+  "In[2461]:=",ExpressionUUID->"83fb33e5-6266-4542-8279-c9f379956227"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorIrredFunLst", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: composed-value function, list of numbers. Returns irreducible \
+values as (number) -> (irreducible value) for all divisors of the list of \
+numbers\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2462]:=",ExpressionUUID->"a76c9ccd-491a-4716-a5fc-b8ab3b78d3b3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DivisorIrredArray", "[", "nvals_", "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"#", " ", "/.", " ", 
+      RowBox[{"DivisorIrredFunLst", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Part", "[", 
+          RowBox[{"nvals", ",", "#"}], "]"}], "&"}], ",", "#"}], "]"}]}], 
+     ")"}], "&"}], " ", "@", " ", 
+   RowBox[{"Range", "[", 
+    RowBox[{"Length", "[", "nvals", "]"}], "]"}]}]}]], "Input",
+ CellLabel->
+  "In[2463]:=",ExpressionUUID->"c7181d03-76f5-43a6-a7cf-3f4a069f3cb8"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"DivisorIrredArray", "::", "usage"}], " ", "=", " ", 
+   "\"\<Args: composed values. Returns: irreducible values summing over all \
+divisor sets.\>\""}], ";"}]], "Input",
+ CellLabel->
+  "In[2464]:=",ExpressionUUID->"a406a598-5744-4800-a0f6-5eb5e70cf662"]
+}, Closed]]
+},
+WindowSize->{756, 745},
+WindowMargins->{{Automatic, 5}, {Automatic, 36}},
+PrivateNotebookOptions->{"VersionedStylesheet"->{"Default.nb"[8.] -> False}},
+ShowSelection->True,
+FrontEndVersion->"13.2 for Mac OS X x86 (64-bit) (November 18, 2022)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"579213f6-66af-449c-90f4-c499a919e3fd"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 2628, 38, 1254, "Text",ExpressionUUID->"c86a98a7-11da-477a-af2c-2c7b115e9ca3"],
+Cell[CellGroupData[{
+Cell[3198, 62, 99, 0, 67, "Section",ExpressionUUID->"f0f84b08-632d-4053-aaff-43cecf71e276"],
+Cell[3300, 64, 345, 9, 30, "Input",ExpressionUUID->"6a0c5ebb-c4c3-4d7d-a7c8-2d163d6c53c0"],
+Cell[3648, 75, 312, 7, 73, "Input",ExpressionUUID->"18e8eeba-e0bb-47a3-83da-8c30f4615d9e"],
+Cell[3963, 84, 442, 13, 30, "Input",ExpressionUUID->"3eb867c4-9ebf-4b36-a7be-b40132c60ef0"],
+Cell[4408, 99, 334, 7, 73, "Input",ExpressionUUID->"e714d15c-e6db-4f71-aa21-5c95fc508a3a"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[4779, 111, 126, 0, 53, "Section",ExpressionUUID->"7b8ac8d8-39b4-4a83-828b-98086652d6b8"],
+Cell[4908, 113, 414, 12, 30, "Input",ExpressionUUID->"0af05713-264f-4d92-8218-8fb61487049f"],
+Cell[5325, 127, 367, 8, 94, "Input",ExpressionUUID->"373e42d2-d8e0-4cd8-bd3c-496f09819b64"],
+Cell[5695, 137, 1593, 42, 178, "Input",ExpressionUUID->"ba3df0d8-cc2b-4d9e-be79-f84f557a764a"],
+Cell[7291, 181, 327, 7, 73, "Input",ExpressionUUID->"8bcdbdc7-5c7b-420d-9339-45e46f0e73e4"],
+Cell[7621, 190, 2012, 53, 220, "Input",ExpressionUUID->"e4f5fd41-b12f-4d88-8874-b31abd4bf63f"],
+Cell[9636, 245, 328, 7, 73, "Input",ExpressionUUID->"1aa43aba-209f-4b9f-bc9a-e79d13269f0e"],
+Cell[9967, 254, 583, 17, 52, "Input",ExpressionUUID->"65cdd591-348f-459a-a980-bdb36879db44"],
+Cell[10553, 273, 318, 7, 73, "Input",ExpressionUUID->"be2d9329-4ec0-4ee2-956c-3c1a60e1a3de"],
+Cell[10874, 282, 702, 21, 73, "Input",ExpressionUUID->"00b912a9-499f-4294-b531-bfb7529833a7"],
+Cell[11579, 305, 276, 7, 52, "Input",ExpressionUUID->"24c893f7-240c-4d05-a32b-c8b05819e8fd"],
+Cell[11858, 314, 1700, 46, 199, "Input",ExpressionUUID->"8e3f9b1a-c610-4dff-ad57-d75a359b8aaf"],
+Cell[13561, 362, 320, 7, 73, "Input",ExpressionUUID->"04ffed0b-039b-412f-beae-51461d1c6ab5"],
+Cell[13884, 371, 1496, 40, 136, "Input",ExpressionUUID->"32a6fd4d-4542-4725-9e06-4520aa96bc84"],
+Cell[15383, 413, 321, 7, 73, "Input",ExpressionUUID->"0c491fce-4cfd-4774-9400-e57058f25b72"],
+Cell[CellGroupData[{
+Cell[15729, 424, 82, 0, 54, "Subsection",ExpressionUUID->"d6495ee9-da85-4474-9b37-67f2b7b6307f"],
+Cell[15814, 426, 252, 6, 30, "Input",ExpressionUUID->"aa04472c-4ca6-4633-87ed-8ec3dc924edc"],
+Cell[16069, 434, 319, 8, 30, "Input",ExpressionUUID->"ce7ab7c7-8cc5-4523-ad11-cfa4f6e13ef7"],
+Cell[16391, 444, 319, 8, 30, "Input",ExpressionUUID->"ae7f15dc-3634-42d4-b1dc-79ad69f6bc46"],
+Cell[16713, 454, 317, 7, 30, "Input",ExpressionUUID->"8b546967-6a91-4eb3-a327-1ffb0d0bb995"],
+Cell[17033, 463, 320, 7, 30, "Input",ExpressionUUID->"cafee51b-0026-431f-af39-300111ba1293"]
+}, Closed]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[17402, 476, 124, 0, 53, "Section",ExpressionUUID->"6658b3cf-2234-44ce-8180-7d757b99da86"],
+Cell[17529, 478, 332, 8, 30, "Input",ExpressionUUID->"b9842963-8916-48e7-885d-d8f4e14155b3"],
+Cell[17864, 488, 296, 7, 73, "Input",ExpressionUUID->"1711ad4d-42dc-4bb6-ac74-faefc3dae409"],
+Cell[18163, 497, 1955, 50, 262, "Input",ExpressionUUID->"3f234219-39c6-4e03-be71-f2a629756391"],
+Cell[20121, 549, 356, 8, 94, "Input",ExpressionUUID->"ba8f9e22-9bf9-4def-8089-a782f6119e2c"],
+Cell[20480, 559, 382, 10, 30, "Input",ExpressionUUID->"ed4d64fa-60a4-4067-ade7-44b7252322e6"],
+Cell[20865, 571, 278, 7, 52, "Input",ExpressionUUID->"eb90426c-7db5-4540-9af8-c81ca1521dba"],
+Cell[21146, 580, 1801, 47, 199, "Input",ExpressionUUID->"3d813b61-e85e-44a9-b2cd-b4773741824c"],
+Cell[22950, 629, 367, 8, 94, "Input",ExpressionUUID->"9a8b8a94-55bc-4c41-b826-996d90cf49ef"],
+Cell[23320, 639, 557, 16, 52, "Input",ExpressionUUID->"48bd32a1-cb4c-4eaf-911c-e72e596eaf7a"],
+Cell[23880, 657, 299, 7, 73, "Input",ExpressionUUID->"a1ef5c88-c1cb-45dd-8909-2b79f7d72bf3"],
+Cell[24182, 666, 2121, 55, 220, "Input",ExpressionUUID->"83fb33e5-6266-4542-8279-c9f379956227"],
+Cell[26306, 723, 371, 8, 94, "Input",ExpressionUUID->"a76c9ccd-491a-4716-a5fc-b8ab3b78d3b3"],
+Cell[26680, 733, 559, 16, 52, "Input",ExpressionUUID->"c7181d03-76f5-43a6-a7cf-3f4a069f3cb8"],
+Cell[27242, 751, 300, 7, 73, "Input",ExpressionUUID->"a406a598-5744-4800-a0f6-5eb5e70cf662"]
+}, Closed]]
+}
+]
+*)
+
