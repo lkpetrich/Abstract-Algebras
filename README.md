@@ -7,10 +7,12 @@ The functions or operators are from some set (the domain set) to the same set, u
 
 A major resource used for the numbers and formulas in many of these notebooks is [The On-Line Encyclopedia of Integer Sequences® (OEIS®)](https://oeis.org/)
 
+
 ## Unary functions
 Functions of one variable - Notebook: `Unary Functions.nb`
 
 For a finite domain set, repeated application of such a function will converge onto a limit cycle of an endlessly repeating sequence, a cycle which can have one member, the fixed point.
+
 
 ## Binary functions
 Functions of two variables - Notebook: `Groupoids.nb`
@@ -25,12 +27,25 @@ They have a variety of possible algebraic properties. For operation *:
 * Ideals generalize zeros to sets
 * Division: for every a, b, there exists a unique x, y satisfying a * x = y * a = b. x and y can be either equal or distnct.
 
+Many familiar operations satisfy some of these properties. These ones are all commutative and associative:
+* Addition: identity: 0
+* Multiplication: identity: 1, zero: 0
+* Minimum: identity: max of domain, zero: min of domain
+* Maximum: identity: min of domain, zero: max of domain
+* Boolean and: identity: true, zero: false
+* Boolean or: identity: false, zero: true
+* Set intersection: identity: universal set of domain, zero: empty set
+* Set union: identity: empty set, zero: universal set of domain
+
+Matrix multiplication is associative without being commutative. Subtraction and division are neither commutative nor associative.
+
 Here are groupoids with some of these features:
 * Semigroup: associative
 * Monoid: associative, identity
 * Group: associative, identity, division (gives inverses)
 * Quasigroup: division
 * Loop: division, identity
+
 
 ## Ternary functions
 Functions of three variables - Notebook: `Pure Ternary Operators.nb`
@@ -58,6 +73,40 @@ I find this table of results
 
 Lbld = labeled, Unlb = unlabeled (isomorphic sets)
 
+
+## Lattices
+Notebook - `Lattices.nb`
+
+An abstract-algebra lattice has two operators, usually called meet and join (mt, jn). Over the lattice's domain, each one is a kind of semigroup called a semilattice: associative, commutative and idempotent (a*a = a). Meet and join are related by
+
+a mt b = a (equivalent) a jn b = b
+
+Both operators define partial orderings, in opposite directions. One can define a dual lattice by renaming meet and join after the other one.
+
+Some lattices (domain, meet, join) are:
+* (numbers, minimum, maximum)
+* (positive integers, gcd, lcm)
+* (sets, intersection, union)
+* Boolean: ({true, false}, and, or)
+
+gcd = greatest common divisor, lcm = least common multiple
+
+These lattices are all distributive, meet being distributive over join and vice versa, though a lattice need not be distributive.
+
+## Rings
+Notebook - `Rings.nb`
+
+An abstract-algebra ring has two operators, usually called addition + and multiplication * in analogy with what they generalize: addition and multiplication over numbers. Addition forms an abelian (commutative) group over the ring's domain, while multiplication forms a semigroup over that domain. Multiplication is distributive over addition:
+* a * (b + c) = (a * b) + (a * c)
+* (a + b) * c = (a * c) + (b * c)
+
+Some rings (domain, addition, multiplication) are:
+* (numbers, addition, multiplication)
+* Boolean: ({true, false}, exclusive or, and)
+
+Also works for polynomials and matrices.
+
+
 ## Partition transform
 Notebook: `Partition Transform.nb`
 
@@ -73,6 +122,6 @@ The powers are symmetrized: n<sup>{m}</sup> = n * (n+1) * ... * (n+m-1) / m!
 This transform is the partition transform, one of Euler's transforms. It can be inverted to find the irreducible counts from the total counts.
 
 The algorithm uses Möbius (Moebius) inversion, also implemented in this notebook:
-* a(n) = sum over d evenly dividing n of b(d)
-* b(n) = sum over d evenly dividing n of mu(n/d)*a(d)
+* a(n) = sum over d evenly dividing n, of b(d)
+* b(n) = sum over d evenly dividing n, of mu(n/d) * a(d)
 where mu(n) is 1 if n = 1, (-1)<sup>m</sup> for n having m distinct prime factors, and 0 for n having a repeated prime factor.
