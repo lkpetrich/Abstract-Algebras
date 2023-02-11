@@ -75,7 +75,7 @@ Lbld = labeled, Unlb = unlabeled (isomorphic sets)
 
 
 ## Lattices
-Notebook - `Lattices.nb`
+Notebook: `Lattices.nb`
 
 An abstract-algebra lattice has two operators, usually called meet and join (mt, jn). Over the lattice's domain, each one is a kind of semigroup called a semilattice: associative, commutative and idempotent (a*a = a). Meet and join are related by
 
@@ -93,8 +93,9 @@ gcd = greatest common divisor, lcm = least common multiple
 
 These lattices are all distributive, meet being distributive over join and vice versa, though a lattice need not be distributive.
 
+
 ## Rings
-Notebook - `Rings.nb`
+Notebook: `Rings.nb`
 
 An abstract-algebra ring has two operators, usually called addition + and multiplication * in analogy with what they generalize: addition and multiplication over numbers. Addition forms an abelian (commutative) group over the ring's domain, while multiplication forms a semigroup over that domain. Multiplication is distributive over addition:
 * a * (b + c) = (a * b) + (a * c)
@@ -105,6 +106,20 @@ Some rings (domain, addition, multiplication) are:
 * Boolean: ({true, false}, exclusive or, and)
 
 Also works for polynomials and matrices.
+
+
+### Rings with Nonabelian Addition Groups
+Notebook: `Rings with Nonabelian Addition Groups.nb`
+
+This is a kind of near-ring where the addition group is made nonabelian. The notebook contains some results and worked examples. A notable result is that all products of elements are abelian under addition.
+
+
+### Galois Fields and Rings
+Notebook: `Galois Fields and Rings.nb`
+
+In abstract algebra, a field is a ring where multiplication is a group over all the domain but the additive identity, 0, the zero of this operation. All the finite fields are known: Galois fields GF(p<sup>n</sup>) for prime p and power n, unique for each order. GF(p) is easy: Z(p). For higher prime powers, the fields can be implemented as polynomials in GF(p) with multiplication having the remainder after dividing by a "primitive polynomial" of degree n. This notebook calculates those polynomials.
+
+It also does so for "Galois rings", which are related. Instead of coefficients in Z(p), it has them in Z(p<sup>m</sup>) for some power m.
 
 
 ## Partition transform
