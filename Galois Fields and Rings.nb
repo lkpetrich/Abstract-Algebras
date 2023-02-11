@@ -1,0 +1,687 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     24526,        679]
+NotebookOptionsPosition[     20576,        607]
+NotebookOutlinePosition[     20972,        623]
+CellTagsIndexPosition[     20929,        620]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ StyleBox["Galois Fields",
+  FontWeight->"Bold"],
+ "\n\nA Galois field is a field with prime-power order. Galois fields are the \
+only finite fields, and they are unique for each order of them.\n\nField \
+GF(p^n) is a polynomial of degree at most n-1 in some variable with \
+coefficients in field GF(p) ~ Z(p) for prime p.\n\nAddition and \
+multiplication are typical polynomial arithmetic, with multiplication being \
+modulo some degree-n monic \[OpenCurlyDoubleQuote]primitive polynomial\
+\[CloseCurlyDoubleQuote]. This notebook finds primitive polynomials and \
+counts of them.\n\nThe additive group: Z(p)^n\nThe multiplicative group: \
+Z(p^n-1)\n\n",
+ StyleBox["Galois Rings",
+  FontWeight->"Bold"],
+ "\n\nA Galois ring is similar, with polynomial addition and polynomial \
+multiplication modulo some primitive polynomial, but with coefficient ring \
+Z(p^m). GR(p^(n*r),p^n) = polynomials with coefficients in Z(p^n) with \
+primitive polynomial of degree r.\nGR(p^r,p) is GF(p^r)\nGR(p^n,p^n) is the \
+ring Z(p^n)\n\nThe order of the group of units (invertible elements) is \
+p^((n-1)*r)*(p^r-1) -- the zero divisors form an ideal with order p^((n-1)*r)\
+\n\nThe multiplicative group is Z(p^r-1) * {if p > 2 or (p = 2 and n <= 2), \
+then Z(p^(n-1))^r, else Z(2^(n-2)) * Z(2^(n-1))^(r-1)}\n\n\
+https://en.wikipedia.org/wiki/Primitive_part_and_content\n\
+https://en.wikipedia.org/wiki/Primitive_polynomial_(field_theory)\n\
+https://en.wikipedia.org/wiki/Irreducible_polynomial"
+}], "Text",ExpressionUUID->"a91a49bb-8545-49c9-b269-cfd502768249"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"NotebookEvaluate", "[", 
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+    "\"\<Partition Transform.nb\>\""}], "]"}], ";"}]], "Input",
+ CellLabel->"In[2]:=",ExpressionUUID->"79a709c3-45bd-47ca-af3d-cd5d13c4c3c7"],
+
+Cell[CellGroupData[{
+
+Cell["Number of primitive polynomials", "Section",ExpressionUUID->"3a276f95-0b79-47bf-9e8d-fb4067858ab8"],
+
+Cell["\<\
+Every polynomial over GF(p) is a product of primitive polynomials, and their \
+degrees are thus a partition of the original polynomial\[CloseCurlyQuote]s \
+degree. Thus, one can use the inverse Euler partition transform to find how \
+many primitive polynomials there are for each degree.
+
+numpplsinv[q,n] - goes from total counts - powers of base value q - to total \
+counts of primitive ones
+numpp[q,n] - count of primitive polynomials with prime q and degree n
+numpplist[q,n] - for all from 1 to n
+numpptest[q,n] - test of this formula
+
+Here, base value q can be symbolic\
+\>", "Text",ExpressionUUID->"a6f012f9-bf40-4631-83b2-808f23d0347e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"numpplsinv", "[", 
+   RowBox[{"q_", ",", 
+    RowBox[{"n_Integer", "/;", 
+     RowBox[{"n", ">", "0"}]}]}], "]"}], " ", ":=", " ", 
+  RowBox[{"PartIrredArray", "[", 
+   RowBox[{"q", "^", 
+    RowBox[{"Range", "[", "n", "]"}]}], "]"}]}]], "Input",
+ CellLabel->
+  "In[142]:=",ExpressionUUID->"0d57a6db-7597-49fc-997e-f63941e19ba4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"numpp", "[", 
+   RowBox[{"q_", ",", 
+    RowBox[{"n_Integer", "/;", 
+     RowBox[{"n", ">", "0"}]}]}], "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"1", "/", "n"}], ")"}], "*", 
+   RowBox[{"DivisorSum", "[", 
+    RowBox[{"n", ",", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"q", "^", 
+        RowBox[{"(", 
+         RowBox[{"n", "/", "#"}], ")"}]}], "*", 
+       RowBox[{"MoebiusMu", "[", "#", "]"}]}], "&"}]}], "]"}]}]}]], "Input",
+ CellLabel->
+  "In[143]:=",ExpressionUUID->"6cd3cd9f-2ecf-43d0-b32b-4f43a9dfd3d1"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"numpplist", "[", 
+   RowBox[{"q_", ",", 
+    RowBox[{"n_Integer", "/;", 
+     RowBox[{"n", ">", "0"}]}]}], "]"}], " ", ":=", " ", 
+  RowBox[{"Table", "[", 
+   RowBox[{
+    RowBox[{"numpp", "[", 
+     RowBox[{"q", ",", "k"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", "n"}], "}"}]}], "]"}]}]], "Input",
+ CellLabel->
+  "In[144]:=",ExpressionUUID->"03d02bec-b9a6-4465-8abd-9b9edce5d846"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"numpptest", "[", 
+   RowBox[{"q_", ",", 
+    RowBox[{"n_Integer", "/;", 
+     RowBox[{"n", ">", "0"}]}]}], "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"PartCompArray", "[", 
+     RowBox[{"numpplist", "[", 
+      RowBox[{"q", ",", "n"}], "]"}], "]"}], " ", "-", " ", 
+    RowBox[{"q", "^", 
+     RowBox[{"Range", "[", "n", "]"}]}]}], " ", "//", " ", 
+   "Expand"}]}]], "Input",
+ CellLabel->
+  "In[145]:=",ExpressionUUID->"143374e0-9d75-4ad8-a305-daeccbb9fdb6"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"numpptest", "[", 
+   RowBox[{"q", ",", "20"}], "]"}], " ", "//", " ", "Tally"}]], "Input",
+ CellLabel->
+  "In[146]:=",ExpressionUUID->"08f9b779-5d99-4824-8ec0-e55602b34151"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"0", ",", "20"}], "}"}], "}"}]], "Output",
+ CellLabel->
+  "Out[146]=",ExpressionUUID->"a930f16b-26f2-46b4-b130-040287fe5c36"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Finding primitive polynomials", "Section",ExpressionUUID->"19276b69-8a50-455e-957f-6bf6dc58fa5c"],
+
+Cell["\<\
+They are found as polynomials in some variable. Args: that variable, the \
+number base (Galois field: prime, Galois ring: prime power), the power of the \
+base in the field / ring: the degree of the primitive polynomial.
+
+Returned is a list of primitive polynomials for powers of the base up to the \
+input power, because the algorithm finds all of them along the way.\
+\>", "Text",ExpressionUUID->"58f04d30-80dc-452e-bcc8-b63312f29250"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FindPrimitivePolynomials", "[", 
+   RowBox[{
+    RowBox[{"x_", "?", "AtomQ"}], ",", 
+    RowBox[{"base_Integer", "/;", 
+     RowBox[{"base", ">", "1"}]}], ",", 
+    RowBox[{"n_Integer", "/;", 
+     RowBox[{"n", ">", "0"}]}]}], "]"}], " ", ":=", " ", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "polybase", ",", "pbnew", ",", "fullpoly", ",", "primpoly", ",", "ppnew",
+       ",", "polymult"}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"polybase", " ", "=", " ", 
+      RowBox[{"{", "0", "}"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"pbnew", " ", "=", " ", 
+      RowBox[{"Range", "[", 
+       RowBox[{"0", ",", 
+        RowBox[{"base", "-", "1"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"polymult", "[", 
+       RowBox[{"p1_", ",", "p2_"}], "]"}], " ", ":=", " ", 
+      RowBox[{"Collect", "[", 
+       RowBox[{
+        RowBox[{"p1", "*", "p2"}], ",", "x", ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"#", ",", "base"}], "]"}], "&"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Do", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"polybase", " ", "=", "  ", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{
+           RowBox[{"Outer", "[", 
+            RowBox[{"Plus", ",", 
+             RowBox[{"Expand", "[", 
+              RowBox[{"x", "*", "polybase"}], "]"}], ",", "pbnew"}], "]"}], 
+           ",", "1"}], "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"ppnew", " ", "=", " ", 
+         RowBox[{
+          RowBox[{"fullpoly", "[", "k", "]"}], " ", "=", " ", 
+          RowBox[{
+           RowBox[{"x", "^", "k"}], " ", "+", " ", "polybase"}]}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Do", "[", 
+         RowBox[{
+          RowBox[{"ppnew", " ", "=", " ", 
+           RowBox[{"Complement", "[", 
+            RowBox[{"ppnew", ",", 
+             RowBox[{"Flatten", "[", 
+              RowBox[{
+               RowBox[{"Outer", "[", 
+                RowBox[{"polymult", ",", 
+                 RowBox[{"fullpoly", "[", "m", "]"}], ",", 
+                 RowBox[{"primpoly", "[", 
+                  RowBox[{"k", "-", "m"}], "]"}]}], "]"}], ",", "1"}], 
+              "]"}]}], "]"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"m", ",", "1", ",", 
+            RowBox[{"k", "-", "1"}]}], "}"}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"primpoly", "[", "k", "]"}], " ", "=", " ", "ppnew"}]}], ",",
+        "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"k", ",", "n"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"primpoly", " ", "/@", " ", 
+      RowBox[{"Range", "[", "n", "]"}]}]}]}], "\[IndentingNewLine]", 
+   "]"}]}]], "Input",
+ CellLabel->"In[81]:=",ExpressionUUID->"c2a86bcf-34d5-4271-8e0e-fe62e2c2b1f8"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{"Examples", " ", "-", " ", 
+    RowBox[{"find", " ", "them"}]}], ",", " ", 
+   RowBox[{"count", " ", "them"}], ",", " ", 
+   RowBox[{"compare", " ", "to", " ", "calculated", " ", "count"}]}], " ", 
+  "*)"}]], "Input",
+ CellLabel->
+  "In[101]:=",ExpressionUUID->"6ed3b156-cdc3-4c36-96c8-115baba001ef"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindPrimitivePolynomials", "[", 
+  RowBox[{"x", ",", "2", ",", "5"}], "]"}]], "Input",
+ CellLabel->"In[91]:=",ExpressionUUID->"222afd92-1043-4e6b-88b0-019bbe5fabf4"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"x", ",", 
+     RowBox[{"1", "+", "x"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"1", "+", "x", "+", 
+     SuperscriptBox["x", "2"]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "4"]}], ",", 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "4"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "4"]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "5"]}], ",", 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "5"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "5"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "4"], "+", 
+      SuperscriptBox["x", "5"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "4"], "+", 
+      SuperscriptBox["x", "5"]}], ",", 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"], "+", 
+      SuperscriptBox["x", "4"], "+", 
+      SuperscriptBox["x", "5"]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[91]=",ExpressionUUID->"16e35107-c93d-4eda-827a-1b7a43a86cb5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Length", " ", "/@", " ", "%"}]], "Input",
+ CellLabel->"In[92]:=",ExpressionUUID->"4bd19bd9-71c1-4c23-aa18-87f3158344fa"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "1", ",", "2", ",", "3", ",", "6"}], "}"}]], "Output",
+ CellLabel->"Out[92]=",ExpressionUUID->"bf061785-c98e-4061-826d-0e9205d263ec"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"numpplist", "[", 
+  RowBox[{"2", ",", "5"}], "]"}]], "Input",
+ CellLabel->"In[93]:=",ExpressionUUID->"f1045e82-3e32-4938-bbb6-470d644b29c6"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "1", ",", "2", ",", "3", ",", "6"}], "}"}]], "Output",
+ CellLabel->"Out[93]=",ExpressionUUID->"db8a1aa8-a8d5-4370-9a5b-ae92dc132e05"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindPrimitivePolynomials", "[", 
+  RowBox[{"x", ",", "3", ",", "3"}], "]"}]], "Input",
+ CellLabel->"In[94]:=",ExpressionUUID->"4664ad4b-e2b9-46e3-a6bc-fd2b0afc94c5"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"x", ",", 
+     RowBox[{"1", "+", "x"}], ",", 
+     RowBox[{"2", "+", "x"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"2", "+", "x", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", "x", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[94]=",ExpressionUUID->"0ea361b3-f173-437d-add5-2e271a44c562"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Length", " ", "/@", " ", "%"}]], "Input",
+ CellLabel->"In[95]:=",ExpressionUUID->"09d988bf-a623-410b-a698-e51e99bd929a"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"3", ",", "3", ",", "8"}], "}"}]], "Output",
+ CellLabel->"Out[95]=",ExpressionUUID->"0ad8bf10-7d90-4f22-950d-20979921419f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"numpplist", "[", 
+  RowBox[{"3", ",", "3"}], "]"}]], "Input",
+ CellLabel->"In[96]:=",ExpressionUUID->"e49b2e12-5ce7-4e43-b17f-6a8c9b1f1f17"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"3", ",", "3", ",", "8"}], "}"}]], "Output",
+ CellLabel->"Out[96]=",ExpressionUUID->"8556b290-202f-405a-8413-227e6b6f8530"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+  "All", " ", "in", " ", "agreement", " ", "with", " ", "the", " ", 
+   "calculated", " ", "counts", " ", "for", " ", "a", " ", "field", " ", 
+   "using", " ", "numpplist"}], " ", "*)"}]], "Input",
+ CellLabel->
+  "In[147]:=",ExpressionUUID->"f4e5cf2f-bd4d-4550-9cb2-565a0a027e20"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Galois", " ", "ring"}], " ", "*)"}]], "Input",
+ CellLabel->"In[19]:=",ExpressionUUID->"facb2de4-b979-421f-bf5c-660f25cd3d39"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindPrimitivePolynomials", "[", 
+  RowBox[{"x", ",", "4", ",", "3"}], "]"}]], "Input",
+ CellLabel->"In[97]:=",ExpressionUUID->"db8d819b-27e8-4293-9f7f-71bc262e5e6e"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"x", ",", 
+     RowBox[{"1", "+", "x"}], ",", 
+     RowBox[{"2", "+", "x"}], ",", 
+     RowBox[{"3", "+", "x"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"2", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"3", "+", "x", "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"2", "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", "x", "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", "x", "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      SuperscriptBox["x", "2"], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", "x", "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"2", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      RowBox[{"2", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", "x", "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"2", " ", "x"}], "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}], ",", 
+     RowBox[{"3", "+", 
+      RowBox[{"3", " ", "x"}], "+", 
+      RowBox[{"3", " ", 
+       SuperscriptBox["x", "2"]}], "+", 
+      SuperscriptBox["x", "3"]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[97]=",ExpressionUUID->"2346c664-d89a-4d77-9344-c56abf4e7bc4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Length", " ", "/@", " ", "%"}]], "Input",
+ CellLabel->"In[98]:=",ExpressionUUID->"dee81342-5da5-4963-8a6b-a177be385201"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"4", ",", "8", ",", "24"}], "}"}]], "Output",
+ CellLabel->"Out[98]=",ExpressionUUID->"17347466-ee67-4807-abee-b1fded417825"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"numpplist", "[", 
+  RowBox[{"4", ",", "3"}], "]"}]], "Input",
+ CellLabel->"In[99]:=",ExpressionUUID->"59b47f35-5848-441b-92b5-ed0344af8c61"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"4", ",", "6", ",", "20"}], "}"}]], "Output",
+ CellLabel->"Out[99]=",ExpressionUUID->"780cb3c1-5123-45c6-8a05-7c60a2974a72"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+  "Note", " ", "the", " ", "difference", " ", "between", " ", "the", " ", 
+   "actual", " ", "values", " ", "and", " ", "the", " ", "values", " ", 
+   "calculated", " ", "using", " ", "the", " ", "algorithm", " ", "for", " ", 
+   "a", " ", "field"}], " ", "*)"}]], "Input",
+ CellLabel->
+  "In[138]:=",ExpressionUUID->"d53a0f35-a471-489f-b3f6-4562061539e6"]
+}, Open  ]]
+},
+WindowSize->{808, 772},
+WindowMargins->{{Automatic, 11}, {Automatic, 62}},
+FrontEndVersion->"13.2 for Mac OS X x86 (64-bit) (January 30, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"1af8dcd8-4ef8-4ccd-bec7-2a61d63c273b"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 1562, 25, 725, "Text",ExpressionUUID->"a91a49bb-8545-49c9-b269-cfd502768249"],
+Cell[2123, 47, 265, 6, 30, "Input",ExpressionUUID->"79a709c3-45bd-47ca-af3d-cd5d13c4c3c7"],
+Cell[CellGroupData[{
+Cell[2413, 57, 105, 0, 67, "Section",ExpressionUUID->"3a276f95-0b79-47bf-9e8d-fb4067858ab8"],
+Cell[2521, 59, 652, 13, 242, "Text",ExpressionUUID->"a6f012f9-bf40-4631-83b2-808f23d0347e"],
+Cell[3176, 74, 364, 10, 30, "Input",ExpressionUUID->"0d57a6db-7597-49fc-997e-f63941e19ba4"],
+Cell[3543, 86, 571, 18, 30, "Input",ExpressionUUID->"6cd3cd9f-2ecf-43d0-b32b-4f43a9dfd3d1"],
+Cell[4117, 106, 431, 13, 30, "Input",ExpressionUUID->"03d02bec-b9a6-4465-8abd-9b9edce5d846"],
+Cell[4551, 121, 509, 15, 30, "Input",ExpressionUUID->"143374e0-9d75-4ad8-a305-daeccbb9fdb6"],
+Cell[CellGroupData[{
+Cell[5085, 140, 208, 5, 30, "Input",ExpressionUUID->"08f9b779-5d99-4824-8ec0-e55602b34151"],
+Cell[5296, 147, 181, 5, 34, "Output",ExpressionUUID->"a930f16b-26f2-46b4-b130-040287fe5c36"]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[5526, 158, 103, 0, 53, "Section",ExpressionUUID->"19276b69-8a50-455e-957f-6bf6dc58fa5c"],
+Cell[5632, 160, 447, 7, 127, "Text",ExpressionUUID->"58f04d30-80dc-452e-bcc8-b63312f29250"],
+Cell[6082, 169, 2912, 74, 325, "Input",ExpressionUUID->"c2a86bcf-34d5-4271-8e0e-fe62e2c2b1f8"],
+Cell[8997, 245, 357, 9, 30, "Input",ExpressionUUID->"6ed3b156-cdc3-4c36-96c8-115baba001ef"],
+Cell[CellGroupData[{
+Cell[9379, 258, 189, 3, 30, "Input",ExpressionUUID->"222afd92-1043-4e6b-88b0-019bbe5fabf4"],
+Cell[9571, 263, 1764, 52, 83, "Output",ExpressionUUID->"16e35107-c93d-4eda-827a-1b7a43a86cb5"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11372, 320, 144, 2, 30, "Input",ExpressionUUID->"4bd19bd9-71c1-4c23-aa18-87f3158344fa"],
+Cell[11519, 324, 182, 3, 34, "Output",ExpressionUUID->"bf061785-c98e-4061-826d-0e9205d263ec"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11738, 332, 164, 3, 30, "Input",ExpressionUUID->"f1045e82-3e32-4938-bbb6-470d644b29c6"],
+Cell[11905, 337, 182, 3, 34, "Output",ExpressionUUID->"db8a1aa8-a8d5-4370-9a5b-ae92dc132e05"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12124, 345, 189, 3, 30, "Input",ExpressionUUID->"4664ad4b-e2b9-46e3-a6bc-fd2b0afc94c5"],
+Cell[12316, 350, 1562, 47, 60, "Output",ExpressionUUID->"0ea361b3-f173-437d-add5-2e271a44c562"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13915, 402, 144, 2, 30, "Input",ExpressionUUID->"09d988bf-a623-410b-a698-e51e99bd929a"],
+Cell[14062, 406, 162, 3, 34, "Output",ExpressionUUID->"0ad8bf10-7d90-4f22-950d-20979921419f"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14261, 414, 164, 3, 30, "Input",ExpressionUUID->"e49b2e12-5ce7-4e43-b17f-6a8c9b1f1f17"],
+Cell[14428, 419, 162, 3, 34, "Output",ExpressionUUID->"8556b290-202f-405a-8413-227e6b6f8530"]
+}, Open  ]],
+Cell[14605, 425, 326, 7, 30, "Input",ExpressionUUID->"f4e5cf2f-bd4d-4550-9cb2-565a0a027e20"],
+Cell[14934, 434, 171, 3, 30, "Input",ExpressionUUID->"facb2de4-b979-421f-bf5c-660f25cd3d39"],
+Cell[CellGroupData[{
+Cell[15130, 441, 189, 3, 30, "Input",ExpressionUUID->"db8d819b-27e8-4293-9f7f-71bc262e5e6e"],
+Cell[15322, 446, 4107, 122, 148, "Output",ExpressionUUID->"2346c664-d89a-4d77-9344-c56abf4e7bc4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19466, 573, 144, 2, 30, "Input",ExpressionUUID->"dee81342-5da5-4963-8a6b-a177be385201"],
+Cell[19613, 577, 163, 3, 34, "Output",ExpressionUUID->"17347466-ee67-4807-abee-b1fded417825"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19813, 585, 164, 3, 30, "Input",ExpressionUUID->"59b47f35-5848-441b-92b5-ed0344af8c61"],
+Cell[19980, 590, 163, 3, 34, "Output",ExpressionUUID->"780cb3c1-5123-45c6-8a05-7c60a2974a72"]
+}, Open  ]],
+Cell[20158, 596, 402, 8, 52, "Input",ExpressionUUID->"d53a0f35-a471-489f-b3f6-4562061539e6"]
+}, Open  ]]
+}
+]
+*)
+
