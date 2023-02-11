@@ -7,6 +7,7 @@ The functions or operators are from some set (the domain set) to the same set, u
 
 A major resource used for the numbers and formulas in many of these notebooks is [The On-Line Encyclopedia of Integer Sequences® (OEIS®)](https://oeis.org/)
 
+# One function
 
 ## Unary functions
 Functions of one variable - Notebook: `Unary Functions.nb`
@@ -74,6 +75,13 @@ I find this table of results
 Lbld = labeled, Unlb = unlabeled (isomorphic sets)
 
 
+## N-ary algebras
+Notebook: `N-ary Algebras.nb`
+
+These are algebras with a single operation, a function that takes some arbitary number of arguments. Surprising as it might seem, there is a general formula for the number of non-isomorphic, unlabeled algebras for some number of arguments and some size of domain set, though it is rather complicated.
+
+# Two functions
+
 ## Lattices
 Notebook: `Lattices.nb`
 
@@ -122,11 +130,7 @@ In abstract algebra, a field is a ring where multiplication is a group over all 
 It also does so for "Galois rings", which are related. Instead of coefficients in Z(p), it has them in Z(p<sup>m</sup>) for some power m.
 
 
-### N-ary algebras
-Notebook: `N-ary Algebras.nb`
-
-These are algebras with a single operation, a function that takes some arbitary number of arguments. Surprising as it might seem, there is a general formula for the number of non-isomorphic, unlabeled algebras for some number of arguments and some size of domain set, though it is rather complicated.
-
+# Utilities
 
 ## Partition transform
 Notebook: `Partition Transform.nb`
