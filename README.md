@@ -108,18 +108,24 @@ Some rings (domain, addition, multiplication) are:
 Also works for polynomials and matrices.
 
 
-### Rings with Nonabelian Addition Groups
+### Rings with nonabelian addition groups
 Notebook: `Rings with Nonabelian Addition Groups.nb`
 
 This is a kind of near-ring where the addition group is made nonabelian. The notebook contains some results and worked examples. A notable result is that all products of elements are abelian under addition.
 
 
-### Galois Fields and Rings
+### Galois fields and rings
 Notebook: `Galois Fields and Rings.nb`
 
 In abstract algebra, a field is a ring where multiplication is a group over all the domain but the additive identity, 0, the zero of this operation. All the finite fields are known: Galois fields GF(p<sup>n</sup>) for prime p and power n, unique for each order. GF(p) is easy: Z(p). For higher prime powers, the fields can be implemented as polynomials in GF(p) with multiplication having the remainder after dividing by a "primitive polynomial" of degree n. This notebook calculates those polynomials.
 
 It also does so for "Galois rings", which are related. Instead of coefficients in Z(p), it has them in Z(p<sup>m</sup>) for some power m.
+
+
+### N-ary algebras
+Notebook: `N-ary Algebras.nb`
+
+These are algebras with a single operation, a function that takes some arbitary number of arguments. Surprising as it might seem, there is a general formula for the number of non-isomorphic, unlabeled algebras for some number of arguments and some size of domain set, though it is rather complicated.
 
 
 ## Partition transform
