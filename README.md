@@ -41,11 +41,16 @@ Many familiar operations satisfy some of these properties. These ones are all co
 Matrix multiplication is associative without being commutative. Subtraction and division are neither commutative nor associative.
 
 Here are groupoids with some of these features:
-* Semigroup: associative
-* Quasigroup: division
-* Loop: division, identity
-* Monoid: associative, identity
-* Group: associative, identity, division (gives inverses)
+| What | Associative | Identity | Division |
+| :--- | :---: | :---: | :---: |
+| Monoid | | | |
+| Quasigroup | | | X |
+| Loop | | X | X |
+| Semigroup | X | | |
+| Monoid | X | X | |
+| Group | X | X | X |
+
+In groups, division gives inverses.
 
 ```mermaid
 graph TD
