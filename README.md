@@ -42,10 +42,20 @@ Matrix multiplication is associative without being commutative. Subtraction and 
 
 Here are groupoids with some of these features:
 * Semigroup: associative
-* Monoid: associative, identity
-* Group: associative, identity, division (gives inverses)
 * Quasigroup: division
 * Loop: division, identity
+* Monoid: associative, identity
+* Group: associative, identity, division (gives inverses)
+
+```mermaid
+graph TD
+Groupoid -- division --> Quasigroup
+Quasigroup -- identity --> Loop
+Loop -- associative --> Group
+Groupoid -- associative--> Semigroup
+Semigroup -- identity --> Monoid
+Monoid -- division --> Group
+```
 
 
 ## Ternary functions
